@@ -1,7 +1,8 @@
-{% extends "base.html" %} ← base.htmlを継承
+{% extends "base.html" %}
 
-{% block title %}Home{% endblock %} ← titleを入れる
+{% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Homeです</h1>
+<h1>ようこそ{{ user.username }}さん、Homeです</h1>
+<a href="{% url 'accounts:logout' %}">Log out</a>
 {% endblock %}

@@ -2,13 +2,15 @@ from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
+from mysite.settings import LOGIN_REDIRECT_URL
+
 from .forms import SignupForm
 
 
 class SignupView(CreateView):
     form_class = SignupForm
     template_name = "accounts/signup.html"
-    success_url = reverse_lazy("tweets:home")
+    success_url = reverse_lazy(LOGIN_REDIRECT_URL)
 
     def form_valid(self, form):
         response = super().form_valid(form)
