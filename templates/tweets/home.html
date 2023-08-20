@@ -3,6 +3,16 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>ようこそ{{ user.username }}さん、Homeです</h1>
-<a href="{% url 'accounts:logout' %}">Log out</a>
+<div>
+    <h1>ようこそ{{ user.username }}さん、Homeです</h1>
+    <a href="{% url 'accounts:logout' %}">Log out</a>
+</div>
+
+{% for tweet in tweets %}
+    <div>
+        <p>published: {{ tweet.published_date }}</p>
+        <h2><a href="">{{ tweet.author }}</a></h2>
+        <p>{{ tweet.text|linebreaksbr }}</p>
+    </div>
+{% endfor %}
 {% endblock %}

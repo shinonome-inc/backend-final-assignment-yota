@@ -1,12 +1,20 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
+
+from .models import Tweet
 
 User = get_user_model()
 
 
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(LoginRequiredMixin, ListView):
+    model = Tweet
     template_name = "tweets/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tweets"] = Tweet.objects.all()
+        return context
 
 
 class UserProfileView(LoginRequiredMixin, DetailView):
