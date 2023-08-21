@@ -27,7 +27,7 @@ class SignupView(CreateView):
 
 class UserProfileView(LoginRequiredMixin, DetailView):
     model = User  # ユーザーモデルを指定
-    template_name = "accounts/detail.html"
+    template_name = "accounts/profile.html"
     slug_field = "username"
     slug_url_kwarg = "username"
     context_object_name = "profile"  # テンプレート内で使用する変数名
