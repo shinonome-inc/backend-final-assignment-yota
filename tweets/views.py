@@ -1,8 +1,8 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse, reverse_lazy
+from django.http import Http404
+from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, ListView, TemplateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
 from .forms import TweetForm
 from .models import Tweet
@@ -32,16 +32,19 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         return response
 
-    def get_success_url(self):
-        messages.success(self.request, "記事を投稿しました。")
-        return reverse("tweets:home")
 
-
-class TweetDetailView(LoginRequiredMixin, TemplateView):
+class TweetDetailView(LoginRequiredMixin, DetailView):
     model = Tweet
     template_name = "tweets/detail.html"
 
-    def get_context_data(self, pk, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["tweet"] = Tweet.objects.get(pk=pk)
-        return context
+
+class TweetDeleteView(LoginRequiredMixin, DeleteView):
+    model = Tweet
+    template_name = "tweets/delete.html"
+    success_url = reverse_lazy("tweets:home")
+
+    def get_object(self):
+        tweet = super().get_object()
+        if tweet.author != self.request.user:
+            raise Http404("ツイ消しは本人にしかできません")
+        return tweet

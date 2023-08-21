@@ -11,8 +11,11 @@
 
 {% for tweet in tweets %}
 <div>
+    {% if tweet.author == request.user %}
+        <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
+    {% endif %}
     <p>published: {{ tweet.published_date }}</p>
-    <h4><a href="">{{ tweet.author }}</a></h4>
+    <h4>username: <a href="">{{ tweet.author }}</a></h4>
     <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
     <hr>
 </div>
