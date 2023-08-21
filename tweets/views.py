@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
 from .forms import TweetForm
 from .models import Tweet
@@ -47,3 +47,12 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         messages.success(self.request, "記事を投稿しました。")
         return reverse("tweets:home")
+
+class TweetDetailView(LoginRequiredMixin, TemplateView):
+    model = Tweet
+    template_name = "tweets/detail.html"
+
+    def get_context_data(self, pk, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tweet"] = Tweet.objects.get(pk=pk)
+        return context

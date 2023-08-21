@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div>
+    <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
+    <a href="{% url 'accounts:logout' %}">Log out</a>
+</div>
+
+
+<div>
+    <p>published: {{ tweet.published_date }}</p>
+    <h4><a href="">{{ tweet.author }}</a></h4>
+    <p>{{ tweet.text|linebreaksbr }}</p>
+    <hr>
+</div>
+
+{% endblock %}
