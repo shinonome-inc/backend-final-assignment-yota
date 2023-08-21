@@ -5,14 +5,16 @@
 {% block content %}
 <div>
     <h1>ようこそ{{ user.username }}さん、Homeです</h1>
+    <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
     <a href="{% url 'accounts:logout' %}">Log out</a>
 </div>
 
 {% for tweet in tweets %}
     <div>
         <p>published: {{ tweet.published_date }}</p>
-        <h2><a href="">{{ tweet.author }}</a></h2>
+        <h4><a href="">{{ tweet.author }}</a></h4>
         <p>{{ tweet.text|linebreaksbr }}</p>
+        <hr>
     </div>
 {% endfor %}
 {% endblock %}
