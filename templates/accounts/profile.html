@@ -3,7 +3,6 @@
 {% block title %}Accounts Detail{% endblock %}
 
 {% block content %}
-
 <div>
     <h1>{{ profile.username }}さんのプロフィールです</h1>
     <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
@@ -11,12 +10,11 @@
 </div>
 
 {% for tweet in tweets %}
-    <div>
-        <p>published: {{ tweet.published_date }}</p>
-        <h4><a href="">{{ tweet.author }}</a></h4>
-        <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
-        <hr>
-    </div>
+<div>
+    <p>published: {{ tweet.published_date }}</p>
+    <h4><a href="">{{ tweet.author }}</a></h4>
+    <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
+    <hr>
+</div>
 {% endfor %}
-
 {% endblock %}

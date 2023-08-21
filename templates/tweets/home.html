@@ -10,11 +10,11 @@
 </div>
 
 {% for tweet in tweets %}
-    <div>
-        <p>published: {{ tweet.published_date }}</p>
-        <h4><a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></h4>
-        <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
-        <hr>
-    </div>
+<div>
+    <p>published: {{ tweet.published_date }}</p>
+    <h4>username: <a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></h4>
+    <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
+    <hr>
+</div>
 {% endfor %}
 {% endblock %}
