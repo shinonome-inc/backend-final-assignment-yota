@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Accounts Detail{% endblock %}
 
 {% block content %}
+
 <div>
-    <h1>ようこそ{{ user.username }}さん、Homeです</h1>
+    <h1>{{ profile.username }}さんのプロフィールです</h1>
     <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
     <a href="{% url 'accounts:logout' %}">Log out</a>
 </div>
@@ -12,9 +13,10 @@
 {% for tweet in tweets %}
     <div>
         <p>published: {{ tweet.published_date }}</p>
-        <h4><a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></h4>
+        <h4><a href="">{{ tweet.author }}</a></h4>
         <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
         <hr>
     </div>
 {% endfor %}
+
 {% endblock %}

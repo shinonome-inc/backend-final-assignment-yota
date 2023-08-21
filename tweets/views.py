@@ -1,14 +1,11 @@
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic import CreateView, ListView, TemplateView
 
 from .forms import TweetForm
 from .models import Tweet
-
-User = get_user_model()
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -19,15 +16,6 @@ class HomeView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["tweets"] = Tweet.objects.all()
         return context
-
-
-class UserProfileView(LoginRequiredMixin, DetailView):
-    model = User  # ユーザーモデルを指定
-    template_name = "tweets/home.html"
-    context_object_name = "user"  # テンプレート内で使用する変数名
-
-    def get_object(self):
-        return User.objects.get(username=self.request.user)
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -47,6 +35,7 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         messages.success(self.request, "記事を投稿しました。")
         return reverse("tweets:home")
+
 
 class TweetDetailView(LoginRequiredMixin, TemplateView):
     model = Tweet

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
 
 {% block content %}
 <div>
@@ -11,7 +10,7 @@
 
 <div>
     <p>published: {{ tweet.published_date }}</p>
-    <h4><a href="">{{ tweet.author }}</a></h4>
+    <h4><a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></h4>
     <p>{{ tweet.text|linebreaksbr }}</p>
     <hr>
 </div>
