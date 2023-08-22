@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
@@ -14,7 +13,8 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tweets"] = Tweet.objects.all()
+        # プリロードしてN+1回避
+        context["tweets"] = Tweet.objects.select_related("author").all()
         return context
 
 
@@ -35,17 +35,21 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
 
 class TweetDetailView(LoginRequiredMixin, DetailView):
     model = Tweet
+    queryset = Tweet.objects.select_related("author")
     template_name = "tweets/detail.html"
 
 
-class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class TweetDeleteView(UserPassesTestMixin, DeleteView):
     model = Tweet
+    queryset = Tweet.objects.select_related("author")
     template_name = "tweets/delete.html"
     success_url = reverse_lazy("tweets:home")
 
+    def get(self, request, *args, **kwargs):
+        # test_funcの方が先に呼ばれるので、getメソッド内でself.objectにアクセス可能
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
     def test_func(self):
-        tweet = super().get_object()
-        if tweet.author == self.request.user:
-            return True
-        else:
-            return False
+        self.object = self.get_object()
+        return self.object.author == self.request.user

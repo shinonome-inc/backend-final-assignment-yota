@@ -35,6 +35,7 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.object
-        context["tweets"] = Tweet.objects.filter(author=user)
+        # プリロードしてN+1回避
+        context["tweets"] = Tweet.objects.select_related("author").filter(author=user)
 
         return context
