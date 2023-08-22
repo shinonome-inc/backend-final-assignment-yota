@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from mysite.settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
+from tweets.models import Tweet
 
 User = get_user_model()
 
@@ -271,8 +272,21 @@ class TestLogoutView(TestCase):
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
-# class TestUserProfileView(TestCase):
-#     def test_success_get(self):
+class TestUserProfileView(TestCase):
+    def setUp(self):        
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
+        self.url = reverse("accounts:profile", kwargs={"username":"testuser"})
+        for i in range(10):
+            Tweet.objects.create(author=self.user, text=f"Test {i+1}")
+
+
+    def test_success_get(self):
+        #context内に含まれるツイートとDBのツイートが一致しているかどうか
+        response = self.client.get(self.url)
+        tweets_in_context = response.context['tweets']
+        tweets_in_db = Tweet.objects.filter(author=self.user)
+        self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
 
 # class TestUserProfileEditView(TestCase):
