@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Create{% endblock %}
+{% block title %}Are you Sure?{% endblock %}
 
 {% block content %}
 <div>
     <h1>消すの？</h1>
+</div>
+<div>
+    <p>本文: {{ object }}</p>
+    
 </div>
 <form method="POST" class="post-form">{% csrf_token %}
     <button type="submit" class="save btn btn-default">消す!</button>

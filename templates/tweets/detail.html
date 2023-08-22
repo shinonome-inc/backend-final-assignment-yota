@@ -7,7 +7,7 @@
     <a href="{% url 'accounts:logout' %}">Log out</a>
 </div>
 <div>
-    {% if tweet.author == request.user %}
+    {% if tweet.author == user %}
         <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
     {% endif %}
     <p>published: {{ tweet.published_date }}</p>
