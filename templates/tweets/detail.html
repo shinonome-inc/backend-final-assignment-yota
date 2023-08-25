@@ -10,7 +10,7 @@
     {% if tweet.author == user %}
         <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
     {% endif %}
-    <p>published: {{ tweet.published_date }}</p>
+    <p>published: {{ tweet.created_at }}</p>
     <p>username: <a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></p>
     <p>{{ tweet.text|linebreaksbr }}</p>
     <hr>

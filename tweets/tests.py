@@ -12,7 +12,7 @@ class TestHomeView(TestCase):
         self.url = reverse("tweets:home")
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.login(username="testuser", password="testpassword")
-        Tweet.objects.create(author=self.user, text=f"Test")
+        Tweet.objects.create(author=self.user, text="Test")
 
     def test_success_get(self):
         response = self.client.get(self.url)
@@ -20,7 +20,7 @@ class TestHomeView(TestCase):
         self.assertTemplateUsed(response, "tweets/home.html")
 
         # context内に含まれるツイートとDBのツイートが一致しているかどうか
-        tweets_in_context = response.context["tweet"]
+        tweets_in_context = response.context["object_list"]
         tweets_in_db = Tweet.objects.all()
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
@@ -75,7 +75,7 @@ class TestTweetCreateView(TestCase):
         tweet_in_db = Tweet.objects.filter(author=invalid_data["author"], text=invalid_data["text"])
         self.assertFalse(tweet_in_db.exists())
         self.assertFalse(form.is_valid())
-        self.assertIn('この値は 280 文字以下でなければなりません( 281 文字になっています)。', form.errors["text"])
+        self.assertIn("この値は 280 文字以下でなければなりません( 281 文字になっています)。", form.errors["text"])
 
 
 class TestTweetDetailView(TestCase):

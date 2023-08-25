@@ -5,12 +5,10 @@ from django.utils import timezone
 
 class Tweet(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    text = models.TextField()
-    created_date = models.DateTimeField(default=timezone.now)
-    published_date = models.DateTimeField(blank=True, null=True)
+    text = models.CharField(max_length=280)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
 
     def publish(self):
-        self.published_date = timezone.now()
         self.save()
 
     def __str__(self):
