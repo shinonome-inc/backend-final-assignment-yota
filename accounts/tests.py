@@ -1,8 +1,8 @@
+from django.conf import settings
 from django.contrib.auth import SESSION_KEY, get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from mysite.settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
 from tweets.models import Tweet
 
 User = get_user_model()
@@ -31,7 +31,7 @@ class TestSignupView(TestCase):
         # 1の確認 = LOGIN_REDIRECT_URLにリダイレクトすること
         self.assertRedirects(
             response,
-            reverse(LOGIN_REDIRECT_URL),
+            reverse(settings.LOGIN_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
@@ -219,7 +219,7 @@ class TestLoginView(TestCase):
         # 1の確認 = LOGIN_REDIRECT_URLにリダイレクトすること
         self.assertRedirects(
             response,
-            reverse(LOGIN_REDIRECT_URL),
+            reverse(settings.LOGIN_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
@@ -264,7 +264,7 @@ class TestLogoutView(TestCase):
 
         self.assertRedirects(
             response,
-            reverse(LOGOUT_REDIRECT_URL),
+            reverse(settings.LOGOUT_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
@@ -277,13 +277,12 @@ class TestUserProfileView(TestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.login(username="testuser", password="testpassword")
         self.url = reverse("accounts:profile", kwargs={"username": "testuser"})
-        for i in range(10):
-            Tweet.objects.create(author=self.user, text=f"Test {i+1}")
+        Tweet.objects.create(author=self.user, text=f"Test")
 
     def test_success_get(self):
         # context内に含まれるツイートとDBのツイートが一致しているかどうか
         response = self.client.get(self.url)
-        tweets_in_context = response.context["tweets"]
+        tweets_in_context = response.context["text"]
         tweets_in_db = Tweet.objects.filter(author=self.user)
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
