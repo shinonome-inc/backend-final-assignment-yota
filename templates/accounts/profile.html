@@ -4,7 +4,7 @@
 
 {% block content %}
 <div>
-    <h1>{{ profile.username }}さんのプロフィールです</h1>
+    <h1>{{ username }}さんのプロフィールです</h1>
     <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
     <a href="{% url 'accounts:logout' %}">Log out</a>
 </div>
