@@ -10,12 +10,7 @@ from .models import Tweet
 class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "tweets/home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # プリロードしてN+1回避
-        context["tweets"] = Tweet.objects.select_related("author").all()
-        return context
+    queryset = Tweet.objects.select_related("author")
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -27,10 +22,9 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         tweet = form.save(commit=False)
         tweet.author = self.request.user
-        tweet.published_date = timezone.now()
+        tweet.created_at = timezone.now()
         tweet = form.save()
-        response = super().form_valid(form)
-        return response
+        return super().form_valid(form)
 
 
 class TweetDetailView(LoginRequiredMixin, DetailView):

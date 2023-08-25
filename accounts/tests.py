@@ -277,12 +277,12 @@ class TestUserProfileView(TestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.login(username="testuser", password="testpassword")
         self.url = reverse("accounts:profile", kwargs={"username": "testuser"})
-        Tweet.objects.create(author=self.user, text=f"Test")
+        Tweet.objects.create(author=self.user, text="Test")
 
     def test_success_get(self):
         # context内に含まれるツイートとDBのツイートが一致しているかどうか
         response = self.client.get(self.url)
-        tweets_in_context = response.context["text"]
+        tweets_in_context = response.context["tweets"]
         tweets_in_db = Tweet.objects.filter(author=self.user)
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
