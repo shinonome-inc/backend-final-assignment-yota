@@ -30,14 +30,16 @@ class UserProfileView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "accounts/profile.html"
     paginate_by = 10
-    context_object_name = "profile"  # テンプレート内で使用する変数名
+
+    def get_queryset(self):
+        username = self.kwargs.get("username")
+        user = get_object_or_404(User, username=username)
+        return Tweet.objects.select_related("author").filter(author=user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         username = self.kwargs.get("username")
-        # プリロードしてN+1回避
         user = get_object_or_404(User, username=username)
-        context["username"] = user
-        context["tweets"] = Tweet.objects.select_related("author").filter(author=user)
+        context["target_user"] = user
 
         return context

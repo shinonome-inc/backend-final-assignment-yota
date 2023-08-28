@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
 from .forms import TweetForm
@@ -22,8 +21,6 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         tweet = form.save(commit=False)
         tweet.author = self.request.user
-        tweet.created_at = timezone.now()
-        tweet = form.save()
         return super().form_valid(form)
 
 

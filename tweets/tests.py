@@ -82,9 +82,8 @@ class TestTweetDetailView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.login(username="testuser", password="testpassword")
-        for i in range(10):
-            Tweet.objects.create(author=self.user, text=f"Test {i+1}")
-        self.url = reverse("tweets:detail", kwargs={"pk": 1})
+        self.tweet = Tweet.objects.create(author=self.user, text="Test")
+        self.url = reverse("tweets:detail", kwargs={"pk": self.tweet.id})
 
     def test_success_get(self):
         response = self.client.get(self.url)
@@ -92,19 +91,19 @@ class TestTweetDetailView(TestCase):
 
         # context内に含まれるツイートとDBのツイートが一致しているかどうか
         tweets_in_context = response.context["tweet"]
-        tweets_in_db = Tweet.objects.filter(pk=1)
+        tweets_in_db = Tweet.objects.filter(pk=self.tweet.id)
         self.assertIn(tweets_in_context, tweets_in_db)
 
 
 class TestTweetDeleteView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
-        Tweet.objects.create(author=self.user, text="Test")
+        self.tweet = Tweet.objects.create(author=self.user, text="Test")
 
     def test_success_post(self):
         self.client.login(username="testuser", password="testpassword")
-        self.url = reverse("tweets:delete", kwargs={"pk": 1})
-        response = self.client.post(self.url)
+        url = reverse("tweets:delete", kwargs={"pk": self.tweet.id})
+        response = self.client.post(url)
 
         self.assertRedirects(
             response,
@@ -117,17 +116,17 @@ class TestTweetDeleteView(TestCase):
 
     def test_failure_post_with_not_exist_tweet(self):
         self.client.login(username="testuser", password="testpassword")
-        self.url = reverse("tweets:delete", kwargs={"pk": 2})
-        response = self.client.post(self.url)
+        url = reverse("tweets:delete", kwargs={"pk": 2})
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 404)
         tweet_in_db = Tweet.objects.filter(author=self.user, text="Test")
         self.assertTrue(tweet_in_db.exists())
 
     def test_failure_post_with_incorrect_user(self):
-        self.different_user = User.objects.create_user(username="different_user", password="differentpassword")
+        User.objects.create_user(username="different_user", password="differentpassword")
         self.client.login(username="different_user", password="differentpassword")
-        self.url = reverse("tweets:delete", kwargs={"pk": 1})
-        response = self.client.post(self.url)
+        url = reverse("tweets:delete", kwargs={"pk": self.tweet.id})
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
         tweet_in_db = Tweet.objects.filter(author=self.user, text="Test")
         self.assertTrue(tweet_in_db.exists())

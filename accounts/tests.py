@@ -282,7 +282,7 @@ class TestUserProfileView(TestCase):
     def test_success_get(self):
         # context内に含まれるツイートとDBのツイートが一致しているかどうか
         response = self.client.get(self.url)
-        tweets_in_context = response.context["tweets"]
+        tweets_in_context = response.context["tweet_list"]
         tweets_in_db = Tweet.objects.filter(author=self.user)
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
