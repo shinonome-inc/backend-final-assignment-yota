@@ -19,8 +19,7 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("tweets:home")
 
     def form_valid(self, form):
-        tweet = form.save(commit=False)
-        tweet.author = self.request.user
+        form.instance.author = self.request.user
         return super().form_valid(form)
 
 
@@ -30,7 +29,7 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
     template_name = "tweets/detail.html"
 
 
-class TweetDeleteView(UserPassesTestMixin, DeleteView):
+class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Tweet
     queryset = Tweet.objects.select_related("author")
     template_name = "tweets/delete.html"

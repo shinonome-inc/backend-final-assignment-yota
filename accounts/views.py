@@ -33,13 +33,11 @@ class UserProfileView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         username = self.kwargs.get("username")
-        user = get_object_or_404(User, username=username)
-        return Tweet.objects.select_related("author").filter(author=user)
+        self.user = get_object_or_404(User, username=username)
+        return Tweet.objects.select_related("author").filter(author=self.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        username = self.kwargs.get("username")
-        user = get_object_or_404(User, username=username)
-        context["target_user"] = user
+        context["target_user"] = self.user
 
         return context

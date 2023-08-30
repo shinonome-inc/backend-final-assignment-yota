@@ -9,7 +9,7 @@
     <a href="{% url 'accounts:logout' %}">Log out</a>
 </div>
 
-{% for tweet in object_list %}
+{% for tweet in tweet_list %}
 <div>
     {% if tweet.author == user %}
         <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
