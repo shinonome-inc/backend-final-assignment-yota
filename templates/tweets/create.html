@@ -3,11 +3,11 @@
 {% block title %}Create{% endblock %}
 
 {% block content %}
-<div>
-    <h1>新しいTweetを作成</h1>
-</div>
-<form method="POST" class="post-form">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="save btn btn-default">Tweet!</button>
-</form>
+    <div>
+        <h1>新しいTweetを作成</h1>
+    </div>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Tweet!</button>
+    </form>
 {% endblock %}

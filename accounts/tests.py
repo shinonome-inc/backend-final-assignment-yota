@@ -47,6 +47,7 @@ class TestSignupView(TestCase):
             "password1": "",
             "password2": "",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -65,6 +66,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -80,6 +82,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -95,6 +98,7 @@ class TestSignupView(TestCase):
             "password1": "",
             "password2": "",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -111,6 +115,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -130,6 +135,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -145,6 +151,7 @@ class TestSignupView(TestCase):
             "password1": "tstpwd",
             "password2": "tstpwd",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -160,6 +167,7 @@ class TestSignupView(TestCase):
             "password1": "testuser",
             "password2": "testuser",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -175,6 +183,7 @@ class TestSignupView(TestCase):
             "password1": "27182818",
             "password2": "27182818",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -190,6 +199,7 @@ class TestSignupView(TestCase):
             "password1": "testuser",
             "password2": "helloworld",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -214,6 +224,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "testpassword",
         }
+
         response = self.client.post(self.url, valid_data)
 
         # 1の確認 = LOGIN_REDIRECT_URLにリダイレクトすること
@@ -223,7 +234,6 @@ class TestLoginView(TestCase):
             status_code=302,
             target_status_code=200,
         )
-
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
@@ -231,6 +241,7 @@ class TestLoginView(TestCase):
             "username": "NotUser",
             "password": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -244,6 +255,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "",
         }
+        
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -268,7 +280,6 @@ class TestLogoutView(TestCase):
             status_code=302,
             target_status_code=200,
         )
-
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
@@ -284,6 +295,7 @@ class TestUserProfileView(TestCase):
         response = self.client.get(self.url)
         tweets_in_context = response.context["tweet_list"]
         tweets_in_db = Tweet.objects.filter(author=self.user)
+        
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
 
