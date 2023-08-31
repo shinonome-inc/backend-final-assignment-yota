@@ -1,18 +1,45 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
-User = get_user_model()
+from .forms import TweetForm
+from .models import Tweet
 
 
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(LoginRequiredMixin, ListView):
+    model = Tweet
     template_name = "tweets/home.html"
+    queryset = Tweet.objects.select_related("author")
 
 
-class UserProfileView(LoginRequiredMixin, DetailView):
-    model = User  # ユーザーモデルを指定
-    template_name = "tweets/home.html"
-    context_object_name = "user"  # テンプレート内で使用する変数名
+class TweetCreateView(LoginRequiredMixin, CreateView):
+    model = Tweet
+    form_class = TweetForm
+    template_name = "tweets/create.html"
+    success_url = reverse_lazy("tweets:home")
 
-    def get_object(self):
-        return User.objects.get(username=self.request.user)
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+class TweetDetailView(LoginRequiredMixin, DetailView):
+    model = Tweet
+    queryset = Tweet.objects.select_related("author")
+    template_name = "tweets/detail.html"
+
+
+class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Tweet
+    queryset = Tweet.objects.select_related("author")
+    template_name = "tweets/delete.html"
+    success_url = reverse_lazy("tweets:home")
+
+    def get(self, request, *args, **kwargs):
+        # test_funcの方が先に呼ばれるので、getメソッド内でself.objectにアクセス可能
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def test_func(self):
+        self.object = self.get_object()
+        return self.object.author == self.request.user

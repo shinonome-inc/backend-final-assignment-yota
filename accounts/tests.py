@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.contrib.auth import SESSION_KEY, get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from mysite.settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
+from tweets.models import Tweet
 
 User = get_user_model()
 
@@ -30,7 +31,7 @@ class TestSignupView(TestCase):
         # 1の確認 = LOGIN_REDIRECT_URLにリダイレクトすること
         self.assertRedirects(
             response,
-            reverse(LOGIN_REDIRECT_URL),
+            reverse(settings.LOGIN_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
@@ -46,6 +47,7 @@ class TestSignupView(TestCase):
             "password1": "",
             "password2": "",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -64,6 +66,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -79,6 +82,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -94,6 +98,7 @@ class TestSignupView(TestCase):
             "password1": "",
             "password2": "",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -110,6 +115,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -129,6 +135,7 @@ class TestSignupView(TestCase):
             "password1": "testpassword",
             "password2": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -144,6 +151,7 @@ class TestSignupView(TestCase):
             "password1": "tstpwd",
             "password2": "tstpwd",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -159,6 +167,7 @@ class TestSignupView(TestCase):
             "password1": "testuser",
             "password2": "testuser",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -174,6 +183,7 @@ class TestSignupView(TestCase):
             "password1": "27182818",
             "password2": "27182818",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -189,6 +199,7 @@ class TestSignupView(TestCase):
             "password1": "testuser",
             "password2": "helloworld",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -213,16 +224,16 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "testpassword",
         }
+
         response = self.client.post(self.url, valid_data)
 
         # 1の確認 = LOGIN_REDIRECT_URLにリダイレクトすること
         self.assertRedirects(
             response,
-            reverse(LOGIN_REDIRECT_URL),
+            reverse(settings.LOGIN_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
-
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
@@ -230,6 +241,7 @@ class TestLoginView(TestCase):
             "username": "NotUser",
             "password": "testpassword",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -243,6 +255,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "",
         }
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -263,16 +276,27 @@ class TestLogoutView(TestCase):
 
         self.assertRedirects(
             response,
-            reverse(LOGOUT_REDIRECT_URL),
+            reverse(settings.LOGOUT_REDIRECT_URL),
             status_code=302,
             target_status_code=200,
         )
-
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
-# class TestUserProfileView(TestCase):
-#     def test_success_get(self):
+class TestUserProfileView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
+        self.url = reverse("accounts:profile", kwargs={"username": "testuser"})
+        Tweet.objects.create(author=self.user, text="Test")
+
+    def test_success_get(self):
+        # context内に含まれるツイートとDBのツイートが一致しているかどうか
+        response = self.client.get(self.url)
+        tweets_in_context = response.context["tweet_list"]
+        tweets_in_db = Tweet.objects.filter(author=self.user)
+
+        self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
 
 # class TestUserProfileEditView(TestCase):
