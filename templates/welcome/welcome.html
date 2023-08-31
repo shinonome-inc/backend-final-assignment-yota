@@ -2,7 +2,11 @@
 {% block content %}
 <nav>
     <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
-    <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+    {% if user.is_authenticated %}
+        <li><a href="{% url 'accounts:logout' %}">Log out</a></li>
+    {% else %}
+        <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+    {% endif %}
 </nav>
 
 {% endblock %}
