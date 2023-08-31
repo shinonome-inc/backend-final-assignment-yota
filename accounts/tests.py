@@ -255,7 +255,7 @@ class TestLoginView(TestCase):
             "username": "testuser",
             "password": "",
         }
-        
+
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
@@ -295,7 +295,7 @@ class TestUserProfileView(TestCase):
         response = self.client.get(self.url)
         tweets_in_context = response.context["tweet_list"]
         tweets_in_db = Tweet.objects.filter(author=self.user)
-        
+
         self.assertQuerysetEqual(tweets_in_context, tweets_in_db, ordered=False)
 
 
