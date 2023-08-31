@@ -1,4 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<a href="{% url 'accounts:login' %}">Log in</a>
+<nav>
+    <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
+    <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+</nav>
+
 {% endblock %}

@@ -2,17 +2,12 @@
 
 
 {% block content %}
-<div>
-    <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
-    <a href="{% url 'accounts:logout' %}">Log out</a>
-</div>
-<div>
-    {% if tweet.author == user %}
-        <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
-    {% endif %}
-    <p>published: {{ tweet.created_at }}</p>
-    <p>username: <a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a></p>
-    <p>{{ tweet.text|linebreaksbr }}</p>
-    <hr>
-</div>
+    <div>
+        <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
+        <p><a href="{% url 'accounts:logout' %}">Log out</a></p>
+    </div>
+        {% include "show_tweet.html" %}
+    <div>
+        <a href="{{request.META.HTTP_REFERER}}">戻る</a>
+    </div>
 {% endblock %}

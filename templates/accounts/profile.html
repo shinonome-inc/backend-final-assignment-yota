@@ -3,21 +3,16 @@
 {% block title %}Accounts Detail{% endblock %}
 
 {% block content %}
-<div>
-    <h1>{{ target_user }}さんのプロフィールです</h1>
-    <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
-    <a href="{% url 'accounts:logout' %}">Log out</a>
-</div>
+    <div>
+        <h1>{{ target_user }}さんのプロフィールです</h1>
+        <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
+        <a href="{% url 'accounts:logout' %}">Log out</a>
+    </div>
 
-{% for tweet in tweet_list %}
-<div>
-    {% if tweet.author == user %}
-        <p><a href="{% url 'tweets:delete' pk=tweet.pk %}">ツイ消しボタン</a></p>
-    {% endif %}
-    <p>published: {{ tweet.created_at }}</p>
-    <h4>username: <a href="">{{ tweet.author }}</a></h4>
-    <p><a href="{% url 'tweets:detail' pk=tweet.pk %}">{{ tweet.text|linebreaksbr }}</a></p>
-    <hr>
-</div>
-{% endfor %}
+    {% for tweet in tweet_list %}
+        {% include "show_tweet.html" %}
+    {% endfor %}
+    <div>
+        <a href="{{request.META.HTTP_REFERER}}">戻る</a>
+    </div>
 {% endblock %}
