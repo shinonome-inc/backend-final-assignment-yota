@@ -6,7 +6,7 @@
         <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
         <p><a href="{% url 'accounts:logout' %}">Log out</a></p>
     </div>
-        {% include "show_tweet.html" %}
+        {% include "tweets/show_tweet.html" %}
     <div>
         <a href="{{request.META.HTTP_REFERER}}">戻る</a>
     </div>

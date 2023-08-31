@@ -10,7 +10,7 @@
     </div>
 
     {% for tweet in tweet_list %}
-        {% include "show_tweet.html" %}
+        {% include "tweets/show_tweet.html" %}
     {% endfor %}
     <div>
         <a href="{{request.META.HTTP_REFERER}}">戻る</a>
