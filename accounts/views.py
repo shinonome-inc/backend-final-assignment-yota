@@ -1,9 +1,12 @@
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, ListView
 
+from accounts.models import FollowRelation
 from mysite.settings import LOGIN_REDIRECT_URL
 from tweets.models import Tweet
 
@@ -39,5 +42,28 @@ class UserProfileView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["target_user"] = self.user
+        context["follow_count"] = self.user.following.count()
+        context["follower_count"] = self.user.followed.count()
 
         return context
+
+
+class FollowView(LoginRequiredMixin, View):
+    template_name = "accounts/profile.html"
+
+    def post(self, request, username):
+        follower = request.user
+        followed = get_object_or_404(User, username=username)
+
+        follow_relation = FollowRelation(following_user=follower, followed_user=followed)
+
+        try:
+            follow_relation.clean_same_person()
+            follow_relation.clean_duplication()
+        except ValidationError as e:
+            print(e)
+            return redirect(reverse("tweets:home"))
+
+        follow_relation.save()
+
+        return redirect(reverse("tweets:home"))
