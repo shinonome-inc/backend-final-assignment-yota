@@ -18,6 +18,14 @@ class FollowRelation(models.Model):
     followed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="followed")
     created_at = models.DateTimeField(default=timezone.now, editable=False)
 
-    def clean_relation(self):
+    def clean_same_person(self):
         if self.followed_user == self.following_user:
             raise ValidationError("自分自身をフォローすることはできない")
+
+    def clean_duplication(self):
+        # 同じユーザーを複数回フォローできないように制約を追加
+        duplicate_relations = FollowRelation.objects.filter(
+            following_user=self.following_user, followed_user=self.followed_user
+        )
+        if duplicate_relations.exists():
+            raise ValidationError("同じユーザーを複数回フォローすることはできません")
