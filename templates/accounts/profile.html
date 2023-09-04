@@ -5,12 +5,19 @@
 {% block content %}
     <div>
         <h1>{{ target_user }}さんのプロフィールです</h1>
-        <p>フォロー:{{ follow_count }}<span>フォロワー:{{ follower_count }}</span></p>
+        <p>フォロー:{{ following|length }}<span>フォロワー:{{ followed|length }}</span></p>
     {% if user != target_user %}
-        <form method="POST" action="{% url 'accounts:follow' username=target_user %}">
-            {% csrf_token %}
-           <button type="submit">フォローする</button>
-        </form>
+        {% if user in followed %}
+            <form method="POST" action="{% url 'accounts:unfollow' username=target_user %}">
+                {% csrf_token %}
+                <button type="submit">フォロー解除</button>
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'accounts:follow' username=target_user %}">
+                {% csrf_token %}
+                <button type="submit">フォローする</button>
+            </form>
+        {% endif %}
     {% endif %}
     </div>
     <div>

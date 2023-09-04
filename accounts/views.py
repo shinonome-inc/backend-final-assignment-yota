@@ -42,8 +42,8 @@ class UserProfileView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["target_user"] = self.user
-        context["follow_count"] = self.user.following.count()
-        context["follower_count"] = self.user.followed.count()
+        context["following"] = [following.following_user for following in self.user.following.all()]
+        context["followed"] = [followed.following_user for followed in self.user.followed.all()]
 
         return context
 
@@ -52,10 +52,10 @@ class FollowView(LoginRequiredMixin, View):
     template_name = "accounts/profile.html"
 
     def post(self, request, username):
-        follower = request.user
+        following = request.user
         followed = get_object_or_404(User, username=username)
 
-        follow_relation = FollowRelation(following_user=follower, followed_user=followed)
+        follow_relation = FollowRelation(following_user=following, followed_user=followed)
 
         try:
             follow_relation.clean_same_person()
@@ -65,5 +65,18 @@ class FollowView(LoginRequiredMixin, View):
             return redirect(reverse("tweets:home"))
 
         follow_relation.save()
+
+        return redirect(reverse("tweets:home"))
+
+
+class UnFollowView(LoginRequiredMixin, View):
+    template_name = "accounts/profile.html"
+
+    def post(self, request, username):
+        following = request.user
+        followed = get_object_or_404(User, username=username)
+
+        follow_relation = FollowRelation.objects.filter(following_user=following, followed_user=followed)
+        follow_relation.delete()
 
         return redirect(reverse("tweets:home"))
