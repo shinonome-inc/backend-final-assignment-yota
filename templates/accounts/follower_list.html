@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Follower{% endblock %}
+
+{% block content %}
+    <h1>フォロワー</h1>
+    {% for relation in followrelation_list %}
+        {{ relation.following_user }}
+        <hr>
+    {% endfor %}
+    <div>
+        <a href="{{request.META.HTTP_REFERER}}">戻る</a>
+    </div>
+{% endblock %}

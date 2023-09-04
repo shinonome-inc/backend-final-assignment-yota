@@ -42,8 +42,9 @@ class UserProfileView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["target_user"] = self.user
-        context["following"] = [following.following_user for following in self.user.following.all()]
-        context["followed"] = [followed.following_user for followed in self.user.followed.all()]
+        context["following_count"] = self.user.following.count()
+        context["followed_count"] = self.user.followed.count()
+        context["is_followed"] = self.user.followed.filter(following_user=self.request.user).exists()
 
         return context
 
@@ -80,3 +81,23 @@ class UnFollowView(LoginRequiredMixin, View):
         follow_relation.delete()
 
         return redirect(reverse("tweets:home"))
+
+
+class FollowingListView(LoginRequiredMixin, ListView):
+    model = FollowRelation
+    template_name = "accounts/following_list.html"
+
+    def get_queryset(self):
+        username = self.kwargs.get("username")
+        self.user = get_object_or_404(User, username=username)
+        return FollowRelation.objects.select_related("followed_user").filter(following_user=self.user)
+
+
+class FollowerListView(LoginRequiredMixin, ListView):
+    model = FollowRelation
+    template_name = "accounts/follower_list.html"
+
+    def get_queryset(self):
+        username = self.kwargs.get("username")
+        self.user = get_object_or_404(User, username=username)
+        return FollowRelation.objects.select_related("following_user").filter(followed_user=self.user)
