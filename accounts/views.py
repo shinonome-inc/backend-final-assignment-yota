@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import ValidationError
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -62,12 +63,11 @@ class FollowView(LoginRequiredMixin, View):
             follow_relation.clean_same_person()
             follow_relation.clean_duplication()
         except ValidationError as e:
-            print(e)
-            return redirect(reverse("tweets:home"))
+            return HttpResponseBadRequest(e)
 
         follow_relation.save()
 
-        return redirect(reverse("tweets:home"))
+        return HttpResponseRedirect(reverse("tweets:home"))
 
 
 class UnFollowView(LoginRequiredMixin, View):
@@ -78,9 +78,13 @@ class UnFollowView(LoginRequiredMixin, View):
         followed = get_object_or_404(User, username=username)
 
         follow_relation = FollowRelation.objects.filter(following_user=following, followed_user=followed)
-        follow_relation.delete()
 
-        return redirect(reverse("tweets:home"))
+        if follow_relation:
+            follow_relation.delete()
+        else:
+            return HttpResponseBadRequest()
+
+        return HttpResponseRedirect(reverse("tweets:home"))
 
 
 class FollowingListView(LoginRequiredMixin, ListView):
