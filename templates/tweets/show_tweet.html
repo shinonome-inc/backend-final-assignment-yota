@@ -1,4 +1,5 @@
 <div>
+    <hr>
     <div>
         <a href="{% url 'accounts:profile' username=tweet.author%}">{{ tweet.author }}</a>
         {{ tweet.created_at }}
@@ -11,5 +12,4 @@
         {% endif %}
     </div>
     <p><a href="{% url 'tweets:detail' pk=tweet.pk%}">{{ tweet.text|linebreaksbr }}</p>
-    <hr>
 </div>
