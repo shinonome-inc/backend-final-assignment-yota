@@ -61,6 +61,10 @@ class FollowView(LoginRequiredMixin, View):
 
         try:
             follow_relation.clean_same_person()
+        except ValidationError as e:
+            return HttpResponseBadRequest(e)
+
+        try:
             follow_relation.clean_duplication()
         except ValidationError as e:
             return HttpResponseBadRequest(e)
