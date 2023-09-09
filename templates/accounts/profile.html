@@ -5,7 +5,23 @@
 {% block content %}
     <div>
         <h1>{{ target_user }}さんのプロフィールです</h1>
-        <p><a href="{% url 'tweets:create' %}">Tweetする</span></a></p>
+        <p><a href="{% url 'accounts:following_list' username=target_user %}">フォロー:{{ following_count }}</a><a href="{% url 'accounts:follower_list' username=target_user %}"><span>フォロワー:{{ followed_count }}</span></a></p>
+    {% if user != target_user %}
+        {% if is_followed %}
+            <form method="POST" action="{% url 'accounts:unfollow' username=target_user %}">
+                {% csrf_token %}
+                <button type="submit">フォロー解除</button>
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'accounts:follow' username=target_user %}">
+                {% csrf_token %}
+                <button type="submit">フォローする</button>
+            </form>
+        {% endif %}
+    {% endif %}
+    </div>
+    <div>
+        <p><a href="{% url 'tweets:create' %}">Tweetする</a></p>
         <a href="{% url 'accounts:logout' %}">Log out</a>
     </div>
 
