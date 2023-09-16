@@ -62,7 +62,7 @@ class FollowView(LoginRequiredMixin, View):
         try:
             follow_relation.full_clean()
         except ValidationError as e:
-            return HttpResponseBadRequest(e)
+            return HttpResponseBadRequest(e.messages)
 
         follow_relation.save()
 
@@ -81,7 +81,7 @@ class UnFollowView(LoginRequiredMixin, View):
         if follow_relation:
             follow_relation.delete()
         else:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("存在しないフォローです")
 
         return HttpResponseRedirect(reverse("tweets:home"))
 

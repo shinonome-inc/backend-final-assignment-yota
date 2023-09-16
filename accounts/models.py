@@ -22,6 +22,7 @@ class FollowRelation(models.Model):
             # 重複するリレーションは登録できない
             models.UniqueConstraint(
                 fields=["following_user", "followed_user"],
+                condition=models.Q(following_user__isnull=False, followed_user__isnull=False),
                 name="unique_relation",
                 violation_error_message="同じユーザーを複数回フォローすることはできません",
             ),
