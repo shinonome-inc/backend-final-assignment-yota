@@ -78,7 +78,7 @@ class UnFollowView(LoginRequiredMixin, View):
 
         follow_relation = FollowRelation.objects.filter(following_user=following, followed_user=followed)
 
-        if follow_relation:
+        if follow_relation.exists():
             follow_relation.delete()
         else:
             return HttpResponseBadRequest("存在しないフォローです")
