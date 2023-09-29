@@ -65,3 +65,20 @@ class LikeView(LoginRequiredMixin, View):
         like_relation.save()
 
         return HttpResponseRedirect(reverse("tweets:home"))
+    
+
+class UnLikeView(LoginRequiredMixin, View):
+    template_name = "tweets/home.html"
+
+    def post(self, request, pk):
+        liking_user = request.user
+        liked_tweet = get_object_or_404(Tweet, pk=pk)
+
+        like_relation = Like.objects.filter(liking_user=liking_user, liked_tweet=liked_tweet)
+
+        if like_relation.exists():
+            like_relation.delete()
+        else:
+            return HttpResponseBadRequest("存在しない いいねです")
+
+        return HttpResponseRedirect(reverse("tweets:home"))
