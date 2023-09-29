@@ -1,9 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
+from django.forms import ValidationError
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
 from .forms import TweetForm
-from .models import Tweet
+from .models import Like, Tweet
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -43,3 +47,21 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         self.object = self.get_object()
         return self.object.author == self.request.user
+
+
+class LikeView(LoginRequiredMixin, View):
+    template_name = "tweets/home.html"
+
+    def post(self, request, pk):
+        liking_user = request.user
+        liked_tweet = get_object_or_404(Tweet, pk=pk)
+        like_relation = Like(liking_user=liking_user, liked_tweet=liked_tweet)
+
+        try:
+            like_relation.full_clean()
+        except ValidationError as e:
+            return HttpResponseBadRequest(e.messages)
+
+        like_relation.save()
+
+        return HttpResponseRedirect(reverse("tweets:home"))
