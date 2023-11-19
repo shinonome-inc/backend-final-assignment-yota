@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.forms import ValidationError
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
@@ -14,6 +13,16 @@ class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "tweets/home.html"
     queryset = Tweet.objects.select_related("author")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        tweets = context["object_list"]
+        for tweet in tweets:
+            tweet.is_liked = Like.objects.filter(liking_user=user, liked_tweet=tweet).exists()
+
+        return context
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -50,35 +59,30 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class LikeView(LoginRequiredMixin, View):
-    template_name = "tweets/home.html"
-
-    def post(self, request, pk):
-        liking_user = request.user
+    def post(self, request, pk, *args, **kwargs):
         liked_tweet = get_object_or_404(Tweet, pk=pk)
-        like_relation = Like(liking_user=liking_user, liked_tweet=liked_tweet)
-
         try:
-            like_relation.full_clean()
-        except ValidationError as e:
-            return HttpResponseBadRequest(e.messages)
+            Like.objects.create(liking_user=request.user, liked_tweet=liked_tweet)
+        except Exception as e:
+            print(e)
+            likes_count = liked_tweet.likes.count()
 
-        like_relation.save()
+            return JsonResponse({"likes_count": likes_count})
 
-        return HttpResponseRedirect(reverse("tweets:home"))
-    
+        likes_count = liked_tweet.likes.count()
+
+        return JsonResponse({"likes_count": likes_count})
+
 
 class UnLikeView(LoginRequiredMixin, View):
-    template_name = "tweets/home.html"
-
-    def post(self, request, pk):
-        liking_user = request.user
+    def post(self, request, pk, *args, **kwargs):
         liked_tweet = get_object_or_404(Tweet, pk=pk)
-
-        like_relation = Like.objects.filter(liking_user=liking_user, liked_tweet=liked_tweet)
+        like_relation = Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)
 
         if like_relation.exists():
             like_relation.delete()
+            likes_count = liked_tweet.likes.count()
         else:
             return HttpResponseBadRequest("存在しない いいねです")
 
-        return HttpResponseRedirect(reverse("tweets:home"))
+        return JsonResponse({"likes_count": likes_count})
