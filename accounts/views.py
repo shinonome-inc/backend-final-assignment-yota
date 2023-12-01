@@ -9,7 +9,7 @@ from django.views.generic import CreateView, ListView
 
 from accounts.models import FollowRelation
 from mysite.settings import LOGIN_REDIRECT_URL
-from tweets.models import Tweet
+from tweets.models import Like, Tweet
 
 from .forms import SignupForm
 
@@ -46,6 +46,9 @@ class UserProfileView(LoginRequiredMixin, ListView):
         context["following_count"] = self.user.following.count()
         context["followed_count"] = self.user.followed.count()
         context["is_followed"] = self.user.followed.filter(following_user=self.request.user).exists()
+        tweets = context["object_list"]
+        for tweet in tweets:
+            tweet.is_liked = Like.objects.filter(liking_user=self.request.user, liked_tweet=tweet).exists()
 
         return context
 
