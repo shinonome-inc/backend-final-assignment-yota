@@ -20,6 +20,8 @@ LikeButtons.forEach(function(like_button){
         // ボタンがクリックされたときに実行されるコード
         var tweetPk = this.getAttribute("data-tweet-pk");
         var data = {pk: tweetPk}
+        var likeIconPath = this.querySelector('path');
+
         console.log(event.target.dataset.isLiked)
 
         if (event.target.dataset.isLiked === "true"){
@@ -40,6 +42,7 @@ LikeButtons.forEach(function(like_button){
                 var updatedLikesCount = response.likes_count;
                 var likesCountElement = this.querySelector('.likes-count');
                 likesCountElement.textContent = updatedLikesCount;
+                likeIconPath.style.fill = '#FFFFFF';
 
                 event.target.dataset.isLiked = false
                 console.log(response, "unlikeが実行された")
@@ -65,6 +68,7 @@ LikeButtons.forEach(function(like_button){
                 var updatedLikesCount = response.likes_count;
                 var likesCountElement = this.querySelector('.likes-count');
                 likesCountElement.textContent = updatedLikesCount;
+                likeIconPath.style.fill = '#BE1931';
 
                 event.target.dataset.isLiked = true;
                 console.log(response, "likeが実行された");

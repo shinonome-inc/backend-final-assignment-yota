@@ -17,7 +17,7 @@
     <div>
         <button type="submit" class="like-button"  data-tweet-pk="{{ tweet.pk }}" data-is-liked="{{ tweet.is_liked | yesno:'true, false' }}">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 36 36" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet">
-                <path fill="#BE1931" d="M2.067 11.319C2.067 2.521 14.251-.74 18 9.445C21.749-.741 33.933 2.52 33.933 11.319C33.933 20.879 18 33 18 33S2.067 20.879 2.067 11.319z"/>
+                <path fill="{{ tweet.is_liked | yesno:'#BE1931, #FFFFFF' }}" d="M2.067 11.319C2.067 2.521 14.251-.74 18 9.445C21.749-.741 33.933 2.52 33.933 11.319C33.933 20.879 18 33 18 33S2.067 20.879 2.067 11.319z"/>
             </svg>
             <div class="likes-count">
                 {{ tweet.likes.count }}
