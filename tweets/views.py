@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
@@ -70,13 +70,10 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class LikeView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         liked_tweet = get_object_or_404(Tweet, pk=pk)
-        try:
-            Like.objects.create(liking_user=request.user, liked_tweet=liked_tweet)
-        except Exception as e:
-            print(e)
-            likes_count = liked_tweet.likes.count()
+        like_relation = Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)
 
-            return JsonResponse({"likes_count": likes_count})
+        if not like_relation.exists():
+            Like.objects.create(liking_user=request.user, liked_tweet=liked_tweet)
 
         likes_count = liked_tweet.likes.count()
 
@@ -90,8 +87,7 @@ class UnLikeView(LoginRequiredMixin, View):
 
         if like_relation.exists():
             like_relation.delete()
-            likes_count = liked_tweet.likes.count()
-        else:
-            return HttpResponseBadRequest("存在しない いいねです")
+
+        likes_count = liked_tweet.likes.count()
 
         return JsonResponse({"likes_count": likes_count})
