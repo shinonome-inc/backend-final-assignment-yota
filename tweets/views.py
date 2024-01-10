@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -8,19 +9,22 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from .forms import TweetForm
 from .models import Like, Tweet
 
+User = get_user_model()
+
 
 class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "tweets/home.html"
-    queryset = Tweet.objects.select_related("author")
+    queryset = Tweet.objects.select_related("author").prefetch_related("likes")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
         tweets = context["object_list"]
+
         for tweet in tweets:
-            tweet.is_liked = Like.objects.filter(liking_user=user, liked_tweet=tweet).exists()
+            tweet.is_liked = user in tweet.likes.all()
 
         return context
 
