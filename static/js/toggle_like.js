@@ -19,10 +19,15 @@ LikeButtons.forEach(function(like_button){
     like_button.addEventListener("click", function(event) {
         // ボタンがクリックされたときに実行されるコード
         var tweetPk = this.getAttribute("data-tweet-pk");
+
         var data = {pk: tweetPk}
         var likeIconPath = this.querySelector('path');
 
-        console.log(event.target.dataset.isLiked)
+        // 初期値がセットされていない場合は設定
+        if (event.target.dataset.isLiked === undefined) {
+            event.target.dataset.isLiked = this.getAttribute("data-is-liked");
+        }
+
 
         if (event.target.dataset.isLiked === "true"){
             var TweetLikeURL = "/tweets/" + tweetPk + "/unlike/";
