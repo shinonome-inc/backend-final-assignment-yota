@@ -24,12 +24,12 @@ LikeButtons.forEach(function(like_button){
         var likeIconPath = this.querySelector('path');
 
         // 初期値がセットされていない場合は設定
-        if (event.target.dataset.isLiked === undefined) {
-            event.target.dataset.isLiked = this.getAttribute("data-is-liked");
+        if (like_button.dataset.isLiked === undefined) {
+            like_button.dataset.isLiked = this.getAttribute("data-is-liked");
         }
 
 
-        if (event.target.dataset.isLiked === "true"){
+        if (like_button.dataset.isLiked === "true"){
             var TweetLikeURL = "/tweets/" + tweetPk + "/unlike/";
             fetch(TweetLikeURL, {
                 method: "POST",
@@ -49,7 +49,7 @@ LikeButtons.forEach(function(like_button){
                 likesCountElement.textContent = updatedLikesCount;
                 likeIconPath.style.fill = '#FFFFFF';
 
-                event.target.dataset.isLiked = false
+                like_button.dataset.isLiked = false
                 console.log(response, "unlikeが実行された")
             })
             .catch(error => {
@@ -75,7 +75,7 @@ LikeButtons.forEach(function(like_button){
                 likesCountElement.textContent = updatedLikesCount;
                 likeIconPath.style.fill = '#BE1931';
 
-                event.target.dataset.isLiked = true;
+                like_button.dataset.isLiked = true;
                 console.log(response, "likeが実行された");
                 
             })
