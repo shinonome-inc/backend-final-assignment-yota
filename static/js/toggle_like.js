@@ -14,14 +14,12 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var LikeButtons = document.querySelectorAll(".like-button")
+const LikeButtons = document.querySelectorAll(".like-button")
 LikeButtons.forEach(function(like_button){
-    like_button.addEventListener("click", function(event) {
+    like_button.addEventListener("click", function() {
         // ボタンがクリックされたときに実行されるコード
-        var tweetPk = this.getAttribute("data-tweet-pk");
-
-        var data = {pk: tweetPk}
-        var likeIconPath = this.querySelector('path');
+        const tweetPk = this.getAttribute("data-tweet-pk");
+        const likeIconPath = this.querySelector('path');
 
         // 初期値がセットされていない場合は設定
         if (like_button.dataset.isLiked === undefined) {
@@ -30,54 +28,49 @@ LikeButtons.forEach(function(like_button){
 
 
         if (like_button.dataset.isLiked === "true"){
-            var TweetLikeURL = "/tweets/" + tweetPk + "/unlike/";
+            const TweetLikeURL = "/tweets/" + tweetPk + "/unlike/";
             fetch(TweetLikeURL, {
                 method: "POST",
                 credentials: "same-origin",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                     "X-CSRFToken": getCookie("csrftoken"),
-                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(response => {
                 // JSONデータを処理してHTML要素を更新
-                var updatedLikesCount = response.likes_count;
-                var likesCountElement = this.querySelector('.likes-count');
+                const updatedLikesCount = response.likes_count;
+                const likesCountElement = this.querySelector('.likes-count');
+
                 likesCountElement.textContent = updatedLikesCount;
                 likeIconPath.style.fill = '#FFFFFF';
 
                 like_button.dataset.isLiked = false
-                console.log(response, "unlikeが実行された")
             })
             .catch(error => {
                 console.error("エラーが発生しました:", error);
             });
         } else {
-            var TweetLikeURL = "/tweets/" + tweetPk + "/like/";
+            const TweetLikeURL = "/tweets/" + tweetPk + "/like/";
             fetch(TweetLikeURL, {
                 method: "POST",
                 credentials: "same-origin",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                     "X-CSRFToken": getCookie("csrftoken"),
-                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(response => {
                 // JSONデータを処理してHTML要素を更新
-                var updatedLikesCount = response.likes_count;
-                var likesCountElement = this.querySelector('.likes-count');
+                const updatedLikesCount = response.likes_count;
+                const likesCountElement = this.querySelector('.likes-count');
+                
                 likesCountElement.textContent = updatedLikesCount;
                 likeIconPath.style.fill = '#BE1931';
 
                 like_button.dataset.isLiked = true;
-                console.log(response, "likeが実行された");
-                
             })
             .catch(error => {
                 console.error("エラーが発生しました:", error);
