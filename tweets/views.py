@@ -87,9 +87,8 @@ class LikeView(LoginRequiredMixin, View):
 class UnLikeView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         liked_tweet = get_object_or_404(Tweet, pk=pk)
-        like_relation = Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)
 
-        if like_relation.exists():
+        if (like_relation := Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)).exists():
             like_relation.delete()
 
         likes_count = liked_tweet.likes.count()
