@@ -48,7 +48,7 @@ class UserProfileView(LoginRequiredMixin, ListView):
         context["is_followed"] = self.user.followed.filter(following_user=self.request.user).exists()
         tweets = context["object_list"]
         for tweet in tweets:
-            tweet.is_liked = self.user in tweet.likes.all()
+            tweet.is_liked = self.request.user in tweet.likes.all()
 
         return context
 
