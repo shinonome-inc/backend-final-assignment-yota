@@ -20,6 +20,7 @@ LikeButtons.forEach(function(like_button){
         // ボタンがクリックされたときに実行されるコード
         const tweetPk = this.getAttribute("data-tweet-pk");
         const likeIconPath = this.querySelector('path');
+        const data = {pk: tweetPk}
 
         // 初期値がセットされていない場合は設定
         if (like_button.dataset.isLiked === undefined) {
@@ -35,7 +36,9 @@ LikeButtons.forEach(function(like_button){
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                     "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
                 },
+                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(response => {
@@ -59,7 +62,9 @@ LikeButtons.forEach(function(like_button){
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                     "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
                 },
+                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(response => {
