@@ -1,15 +1,32 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
 from .forms import TweetForm
-from .models import Tweet
+from .models import Like, Tweet
+
+User = get_user_model()
 
 
 class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "tweets/home.html"
-    queryset = Tweet.objects.select_related("author")
+    queryset = Tweet.objects.select_related("author").prefetch_related("likes")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        tweets = context["object_list"]
+
+        for tweet in tweets:
+            tweet.is_liked = user in tweet.likes.all()
+
+        return context
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -28,6 +45,15 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
     queryset = Tweet.objects.select_related("author")
     template_name = "tweets/detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        tweet = context["object"]
+        tweet.is_liked = Like.objects.filter(liking_user=user, liked_tweet=tweet).exists()
+
+        return context
+
 
 class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Tweet
@@ -43,3 +69,28 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         self.object = self.get_object()
         return self.object.author == self.request.user
+
+
+class LikeView(LoginRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        liked_tweet = get_object_or_404(Tweet, pk=pk)
+        like_relation = Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)
+
+        if not like_relation.exists():
+            Like.objects.create(liking_user=request.user, liked_tweet=liked_tweet)
+
+        likes_count = liked_tweet.likes.count()
+
+        return JsonResponse({"likes_count": likes_count})
+
+
+class UnLikeView(LoginRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        liked_tweet = get_object_or_404(Tweet, pk=pk)
+
+        if (like_relation := Like.objects.filter(liking_user=request.user, liked_tweet=liked_tweet)).exists():
+            like_relation.delete()
+
+        likes_count = liked_tweet.likes.count()
+
+        return JsonResponse({"likes_count": likes_count})

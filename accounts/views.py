@@ -38,7 +38,7 @@ class UserProfileView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         username = self.kwargs.get("username")
         self.user = get_object_or_404(User, username=username)
-        return Tweet.objects.select_related("author").filter(author=self.user)
+        return Tweet.objects.select_related("author").prefetch_related("likes").filter(author=self.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,6 +46,9 @@ class UserProfileView(LoginRequiredMixin, ListView):
         context["following_count"] = self.user.following.count()
         context["followed_count"] = self.user.followed.count()
         context["is_followed"] = self.user.followed.filter(following_user=self.request.user).exists()
+        tweets = context["object_list"]
+        for tweet in tweets:
+            tweet.is_liked = self.request.user in tweet.likes.all()
 
         return context
 
